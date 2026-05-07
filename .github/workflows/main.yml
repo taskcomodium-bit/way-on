@@ -1,1 +1,30 @@
+name: Discord Bot Runner
 
+on:
+  schedule:
+    # Bot akan otomatis di-restart setiap 5 jam (biar nggak kena limit durasi GitHub)
+    - cron: '0 */5 * * *'
+  workflow_dispatch: # Memungkinkan kamu menjalankan bot secara manual kapan saja
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Discord Bot
+        # Timeout disetel ke 5 jam (18000 detik) 
+        # agar tidak tabrakan dengan jadwal cron berikutnya
+        run: timeout 18000s node index.js
+        env:
+          TOKEN: ${{ secrets.DISCORD_TOKEN }}
